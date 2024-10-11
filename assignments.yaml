@@ -59,3 +59,18 @@
       required: false
       params:
         preprocess_fn: preprocess
+
+- notebook: autograd
+  testfile: test_autograd
+  deadline: 2024-11-05
+  tests:
+    - name: TestAddTensors
+      points: 3
+    - name: TestSubTensors
+      points: 3
+    - name: TestMulTensors
+      points: 3
+    - name: TestDivTensors
+      points: 3
+    - name: TestBackprop
+      points: 8
