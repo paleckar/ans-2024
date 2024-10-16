@@ -58,11 +58,21 @@ class TestBinaryOpTensors(ANSTestCase):
                     except RuntimeError:  # Number + vector shape combination will fail on .item()
                         continue
 
-                   # forward pass
+                    # forward pass
                     z = self.forward(x, y)  # with Variables
-                    self.assertIsInstance(z, Variable)
                     expected_z = self.forward(getattr(x, 'data', x), getattr(y, 'data', y))  # with Tensors
                     self.assertTensorsClose(z.data, expected_z)
+                    self.assertIsInstance(z, Variable)
+                    self.assertIsNotNone(z.grad_fn)
+                    self.assertIsNone(z.grad)
+                    self.assertIsInstance(z.parents, tuple)
+                    self.assertEqual(len(z.parents), 2)
+                    if isinstance(x, Variable):
+                        self.assertIs(z.parents[0], x)
+                        self.assertIsNone(x.grad)
+                    if isinstance(y, Variable):
+                        self.assertIs(z.parents[1], y)
+                        self.assertIsNone(y.grad)
 
                     # backward pass
                     dz = torch.randn_like(z.data)

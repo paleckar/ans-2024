@@ -82,6 +82,10 @@ class TestTrainStep(ANSTestCase):
 
     def test_implementation(self):
         self.assertNoLoops(ans.classification.TwoLayerPerceptron.train_step)
+        self.assertNotCalling(
+            ans.classification.TwoLayerPerceptron.train_step,
+            ['CrossEntropyLoss', 'cross_entropy', 'Softmax', 'softmax', 'backward']
+        )
 
     def test_step(self):
         loss, scores = self.model.train_step(self.inputs, self.targets, learning_rate=self.learning_rate)
@@ -123,6 +127,10 @@ class TestValStep(TestTrainStep):
 
     def test_implementation(self):
         self.assertNoLoops(ans.classification.TwoLayerPerceptron.val_step)
+        self.assertNotCalling(
+            ans.classification.TwoLayerPerceptron.val_step,
+            ['CrossEntropyLoss', 'cross_entropy', 'Softmax', 'softmax', 'backward']
+        )
 
     def test_step(self):
         expected_weight1 = self.model.weight1.clone()

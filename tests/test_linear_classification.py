@@ -130,7 +130,11 @@ class TestTrainStepSoftmax(ANSTestCase):
         self.learning_rate = 0.1234
 
     def test_implementation(self):
-        self.assertNoLoops(self.model_cls.train_step)
+        self.assertNoLoops(ans.classification.LinearSoftmaxModel.train_step)
+        self.assertNotCalling(
+            ans.classification.LinearSoftmaxModel.train_step,
+            ['CrossEntropyLoss', 'cross_entropy', 'Softmax', 'softmax', 'backward']
+        )
 
     def test_step(self):
         loss, scores = self.model.train_step(self.inputs, self.targets, learning_rate=self.learning_rate)
@@ -162,7 +166,12 @@ class TestTrainStepSoftmax(ANSTestCase):
 class TestValStepSoftmax(TestTrainStepSoftmax):
 
     def test_implementation(self):
-        self.assertNoLoops(self.model_cls.val_step)
+        self.assertNoLoops(ans.classification.LinearSoftmaxModel.val_step)
+        self.assertNotCalling(
+            ans.classification.LinearSoftmaxModel.val_step,
+            ['CrossEntropyLoss', 'cross_entropy', 'Softmax', 'softmax', 'backward', 'HingeEmbeddingLoss',
+             'hinge_embedding_loss', 'MultiMarginLoss', 'multi_margin_loss']
+        )
 
     def test_step(self):
         expected_weight = self.model.weight.clone()  # sholud not be modified in val_step
@@ -234,20 +243,21 @@ class TestTrainEpoch(ANSTestCase):
             [0.9554, 0.3023, 0.1847, 0.4373, 0.4032],
             [0.2513, 0.4600, 0.4850, 0.4161, 0.7903],
             [0.4853, 0.6241, 0.5177, 0.9216, 0.5183],
-            [0.3431, 0.0639, 0.1924, 0.2636, 0.3692]
+            [0.3431, 0.0639, 0.1924, 0.2636, 0.3692],
+            [0.4227, 0.7406, 0.8387, 0.2885, 0.5232]
         ])
-        y = torch.tensor([0, 2, 0, 1, 0, 2, 2, 0, 1, 2])
+        y = torch.tensor([2, 2, 0, 1, 2, 1, 2, 0, 2, 0, 2])
         self.dataset = torch.utils.data.TensorDataset(x, y)
         self.loader = ans.data.BatchLoader(self.dataset, batch_size=2)
         self.model = ans.classification.LinearSoftmaxModel(5, 3)
         self.model.weight = torch.tensor([
-            [-1.0571, -0.1235,  0.4935],
-            [-0.2807, -0.6546,  1.2959],
-            [-0.0452,  0.1982,  0.0118],
-            [-0.2656,  0.8765, -0.9573],
-            [-1.6125, -0.4814,  2.1671]
+            [ 0.5258,  0.7127, -0.4763],
+            [-0.6679,  1.6683,  0.2156],
+            [ 1.9647,  0.4357, -1.1398],
+            [-0.5301,  0.0127, -0.2765],
+            [ 1.4234, -0.8227,  0.7401]
         ])
-        self.model.bias = torch.tensor([0.5214, -0.0168, -0.3000])
+        self.model.bias = torch.tensor([0.2106, 1.1809, 0.5028])
 
     def test_implementation(self) -> None:
         self.assertCalling(ans.classification.train_epoch, ['train_step'])
@@ -255,14 +265,14 @@ class TestTrainEpoch(ANSTestCase):
     def test_step(self) -> None:
         ans.classification.train_epoch(self.model, self.loader, learning_rate=0.1234)
         expected_weight = torch.tensor([
-            [-1.0093, -0.1498,  0.4720],
-            [-0.1603, -0.6831,  1.2040],
-            [ 0.0221,  0.1947, -0.0521],
-            [-0.1926,  0.8696, -1.0234],
-            [-1.5388, -0.4920,  2.1041]
+            [ 0.4746,  0.5978, -0.3102],
+            [-0.6881,  1.4519,  0.4522],
+            [ 1.9002,  0.2733, -0.9130],
+            [-0.5571, -0.1583, -0.0785],
+            [ 1.4112, -0.9187,  0.8483]
         ])
         self.assertTensorsClose(self.model.weight, expected_weight)
-        expected_bias = torch.tensor([0.6687, -0.0505, -0.4136])
+        expected_bias = torch.tensor([0.1476, 0.9072, 0.8395])
         self.assertTensorsClose(self.model.bias, expected_bias)
 
 
@@ -274,18 +284,18 @@ class TestValidate(TestTrainEpoch):
     def test_step(self) -> None:
         mean_loss, mean_acc = ans.classification.validate(self.model, self.loader)
         expected_weight = torch.tensor([
-            [-1.0571, -0.1235,  0.4935],
-            [-0.2807, -0.6546,  1.2959],
-            [-0.0452,  0.1982,  0.0118],
-            [-0.2656,  0.8765, -0.9573],
-            [-1.6125, -0.4814,  2.1671]
+            [ 0.5258,  0.7127, -0.4763],
+            [-0.6679,  1.6683,  0.2156],
+            [ 1.9647,  0.4357, -1.1398],
+            [-0.5301,  0.0127, -0.2765],
+            [ 1.4234, -0.8227,  0.7401]
         ])
         self.assertTensorsClose(self.model.weight, expected_weight)  # model params must not change
-        expected_bias = torch.tensor([0.5214, -0.0168, -0.3000])
+        expected_bias = torch.tensor([0.2106, 1.1809, 0.5028])
         self.assertTensorsClose(self.model.bias, expected_bias)    # model params must not change
-        expected_loss = 1.36583
+        expected_loss = 2.162376
         self.assertTensorsClose(mean_loss, expected_loss)
-        expected_acc = 0.5
+        expected_acc = 0.1818182
         self.assertTensorsClose(mean_acc, expected_acc)
 
 
@@ -340,6 +350,13 @@ class TestTrainStepSVM(TestTrainStepSoftmax):
             [ 0.8099, -0.3242, -0.0966],
             [ 1.1331, -0.6054,  0.3497]
         ])
+    
+    def test_implementation(self):
+        self.assertNoLoops(ans.classification.LinearSVMModel.train_step)
+        self.assertNotCalling(
+            ans.classification.LinearSVMModel.train_step,
+            ['backward', 'HingeEmbeddingLoss', 'hinge_embedding_loss', 'MultiMarginLoss', 'multi_margin_loss']
+        )
 
     def test_step(self):
         loss, scores = self.model.train_step(self.inputs, self.targets, learning_rate=self.learning_rate)
@@ -369,6 +386,13 @@ class TestTrainStepSVM(TestTrainStepSoftmax):
 
 
 class TestValStepSVM(TestTrainStepSVM):
+
+    def test_implementation(self):
+        self.assertNoLoops(ans.classification.LinearSVMModel.val_step)
+        self.assertNotCalling(
+            ans.classification.LinearSVMModel.val_step,
+            ['backward', 'HingeEmbeddingLoss', 'hinge_embedding_loss', 'MultiMarginLoss', 'multi_margin_loss']
+        )
 
     def test_step(self):
         expected_weight = self.model.weight.clone()  # sholud not be modified in val_step

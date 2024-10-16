@@ -20,6 +20,6 @@
 
 | #  | úloha                                                           | body    | deadline   |
 |----|-----------------------------------------------------------------|---------|------------|
-| 1. | [Lineární klasifikace](assignments/linear_classification.ipynb) | 20 (32) | 15.10.2024 |
-| 2. | [Dvouvrstvý perceptron](assignments/two_layer_perceptron.ipynb) | 14 (17) | 22.10.2024 |
+| 1. | [Lineární klasifikace](assignments/linear_classification.ipynb) | 20 (32) | 22.10.2024 |
+| 2. | [Dvouvrstvý perceptron](assignments/two_layer_perceptron.ipynb) | 14 (17) | 29.10.2024 |
 | 3. | [Autograd](assignments/autograd.ipynb)                          | 20 (20) | 5.11.2024  |

@@ -1,6 +1,6 @@
 - notebook: linear_classification
   testfile: test_linear_classification
-  deadline: 2024-10-15
+  deadline: 2024-10-22
   tests:
     - name: TestPreprocess
       points: 1
@@ -38,7 +38,7 @@
 
 - notebook: two_layer_perceptron
   testfile: test_two_layer_perceptron
-  deadline: 2024-10-22
+  deadline: 2024-10-29
   tests:
     - name: TestPreprocess
       points: 1
