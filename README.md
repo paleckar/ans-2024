@@ -3,12 +3,14 @@
 
 ## Přednášky
 
-| #  | datum     | přednáška                                        | obsah                                       |
-|----|-----------|--------------------------------------------------|---------------------------------------------|
-| 0. | 18.9.2024 | [Úvod](slides/ans-00-intro.pdf)                  | podmínky předmětu, úvod                     |
-| 1. | 18.9.2024 | [Lineární klasifikace](slides/ans-01-linear.pdf) | lineární klasifikace, softmax, svm          |
-| 2. | 25.9.2024 | [Optimalizace](slides/ans-02-optimization.pdf)   | optimalizace, gradient, SGD, momentum, Adam |
-| 3. | 2.10.2024 | [Zpětná propagace](slides/ans-03-backprop.pdf)   | zpětná propagace, reverzní aut. derivování  |
+| #  | datum      | přednáška                                          | obsah                                        |
+|----|------------|----------------------------------------------------|----------------------------------------------|
+| 0. | 18.9.2024  | [Úvod](slides/ans-00-intro.pdf)                    | podmínky předmětu, úvod                      |
+| 1. | 18.9.2024  | [Lineární klasifikace](slides/ans-01-linear.pdf)   | lineární klasifikace, softmax, svm           |
+| 2. | 25.9.2024  | [Optimalizace](slides/ans-02-optimization.pdf)     | optimalizace, gradient, SGD, momentum, Adam  |
+| 3. | 2.10.2024  | [Zpětná propagace](slides/ans-03-backprop.pdf)     | zpětná propagace, reverzní aut. derivování   |
+| 4. | 9.10.2024  | [Trénování sítí v praxi I](slides/ans-04-mlp.pdf)  | vícevrstvý perceptron, aktivace, nelinearity |
+| 5. | 16.10.2024 | [Trénování sítí v praxi II](slides/ans-04-mlp.pdf) | inicializace, regularizace, trénování        |
 
 
 ## Úlohy
