@@ -292,7 +292,7 @@ def accuracy(scores: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
 def softmax_cross_entropy(
     logits: Union[torch.Tensor, ans.autograd.Variable],
     targets: torch.Tensor,
-) -> ans.autograd.Variable:
+) -> Union[torch.Tensor, ans.autograd.Variable]:
     ########################################
     # TODO: implement
 

@@ -184,6 +184,7 @@ class TestSoftmaxCrossEntropy(ANSTestCase):
             [ 0.2581,  0.2241, -0.7185, -0.6629, -0.5596, -0.3593],
             [-0.1632, -0.7233, -1.1309, -0.7355,  0.6958, -0.7722]
         ])
+        self.logits.requires_grad_(True)
         self.targets = torch.tensor([0, 1, 0, 1, 1, 2, 2, 2, 0, 1])
    
     def test_implementation(self):
@@ -193,16 +194,19 @@ class TestSoftmaxCrossEntropy(ANSTestCase):
         )
         self.assertNoLoops(ans.classification.softmax_cross_entropy)
     
-    def _test_sce(self, variable: bool):
-        logits = Variable(self.logits) if variable else self.logits
-        loss = ans.classification.softmax_cross_entropy(logits, self.targets)
-        self.assertIsInstance(loss, Variable)
-        expected_loss = torch.tensor(1.9227699, dtype=loss.data.dtype, device=loss.data.device)
-        self.assertTensorsClose(loss.data, expected_loss)
-    
-    def test_softmax_cross_entropy(self):
-        self._test_sce(False)
-        self._test_sce(True)
+    def test_sce(self):
+        loss_pt = ans.classification.softmax_cross_entropy(self.logits, self.targets)  # with Tensors
+        self.assertIsInstance(loss_pt, torch.Tensor)
+        logits_var = Variable(self.logits)
+        loss_var = ans.classification.softmax_cross_entropy(logits_var, self.targets)  # with Variables
+        self.assertIsInstance(loss_var, Variable)
+        self.assertTensorsClose(loss_var.data, loss_pt)
+        expected_loss = torch.tensor(1.9227699, dtype=loss_pt.data.dtype, device=loss_pt.data.device)
+        self.assertTensorsClose(loss_var.data, expected_loss)
+
+        loss_pt.backward()  # pytorch backprop
+        loss_var.backprop()  # ans backprop
+        self.assertTensorsClose(logits_var.grad, self.logits.grad)
 
 
 class TestInit(ANSTestCase):
