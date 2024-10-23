@@ -108,6 +108,79 @@ class Variable:
 
         # ENDTODO
         ########################################
+    
+    def __matmul__(self, other: BinOpOtherType) -> Self:
+        ########################################
+        # TODO: implement
+
+        raise NotImplementedError
+
+        # ENDTODO
+        ########################################
+    
+    def __rmatmul__(self, other: BinOpOtherType) -> Self:
+        ########################################
+        # TODO: implement
+
+        raise NotImplementedError
+
+        # ENDTODO
+        ########################################
+
+    def __getitem__(self, item) -> Self:
+        ########################################
+        # TODO: implement
+
+        raise NotImplementedError
+    
+        # ENDTODO
+        ########################################
+    
+    def log(self) -> Self:
+        ########################################
+        # TODO: implement
+
+        raise NotImplementedError
+    
+        # ENDTODO
+        ########################################
+
+    def exp(self) -> Self:
+        ########################################
+        # TODO: implement
+
+        raise NotImplementedError
+    
+        # ENDTODO
+        ########################################
+    
+    def sigmoid(self) -> Self:
+        ########################################
+        # TODO: implement
+
+        raise NotImplementedError
+    
+        # ENDTODO
+        ########################################
+    
+    def sum(self, dim: Union[None, int, tuple[int, ...]] = None, keepdim: bool = False) -> Self:
+        ########################################
+        # TODO: implement
+
+        raise NotImplementedError
+    
+        # ENDTODO
+        ########################################
+    
+    def mean(self, dim: Union[None, int, tuple[int, ...]] = None, keepdim: bool = False) -> Self:
+        ########################################
+        # TODO: implement
+
+        raise NotImplementedError
+    
+        # ENDTODO
+        ########################################
+
 
     def backprop(self, dout: Optional[torch.Tensor] = None) -> None:
         """

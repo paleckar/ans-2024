@@ -49,6 +49,8 @@ class TestBinaryOpTensors(ANSTestCase):
         for x_shape, y_shape in self.shape_pairs:
             for dtype, device in self.dds:
                 for x_type, y_type in self.input_types:
+                    msg = (f"\n*** TEST PARAMS CONFIGURATION THAT FAILED ***\n"
+                           f"x_shape={x_shape}, y_shape={y_shape}, dtype={dtype}, device={device}, x_type={x_type}, y_type={y_type}")
                     x_var = rand_var(*x_shape, requires_grad=True, dtype=dtype, device=device)
                     y_var = rand_var(*y_shape, requires_grad=True, dtype=dtype, device=device)
 
@@ -59,9 +61,13 @@ class TestBinaryOpTensors(ANSTestCase):
                         continue
 
                     # forward pass
-                    z = self.forward(x, y)  # with Variables
+                    try:
+                        z = self.forward(x, y)  # with Variables
+                    except Exception:
+                        print(msg)  # for debug purposes
+                        raise
                     expected_z = self.forward(getattr(x, 'data', x), getattr(y, 'data', y))  # with Tensors
-                    self.assertTensorsClose(z.data, expected_z)
+                    self.assertTensorsClose(z.data, expected_z, msg=msg)
                     self.assertIsInstance(z, Variable)
                     self.assertIsNotNone(z.grad_fn)
                     self.assertIsNone(z.grad)
@@ -77,11 +83,15 @@ class TestBinaryOpTensors(ANSTestCase):
                     # backward pass
                     dz = torch.randn_like(z.data)
                     expected_z.backward(gradient=dz)
-                    dx, dy = z.grad_fn(dz)
+                    try:
+                        dx, dy = z.grad_fn(dz)
+                    except Exception:
+                        print(msg)  # for debug pruposes
+                        raise
                     if isinstance(x, Variable):
-                        self.assertTensorsClose(dx, x_var.data.grad)
+                        self.assertTensorsClose(dx, x_var.data.grad, msg=msg)
                     if isinstance(y, Variable):
-                        self.assertTensorsClose(dy, y_var.data.grad)
+                        self.assertTensorsClose(dy, y_var.data.grad, msg=msg)
 
 
 class TestBinaryOpScalars(TestBinaryOpTensors):
