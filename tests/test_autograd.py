@@ -204,7 +204,7 @@ class TestBackprop(ANSTestCase):
                         for var in variables:
                             self.assertTensorsClose(var.grad, var.data.grad)
                             expected_call_count = 1 if var.parents else 0    # each node's chainrule must be called at most once
-                            self.assertEquals(call_counts[var], expected_call_count)
+                            self.assertEqual(call_counts[var], expected_call_count)
 
 
 def example_1(
