@@ -213,17 +213,17 @@ class TestInit(ANSTestCase):
 
     def check_init_layer(self, w: torch.Tensor, b: torch.Tensor, expected_shape: tuple[int, int], init_scale: float):
         D, K = expected_shape
-        self.assertIsInstance(w, torch.Tensor)
-        self.assertIsInstance(b, torch.Tensor)
-        self.assertTupleEqual(w.shape, (D, K))
-        self.assertTupleEqual(b.shape, (K,))
-        self.assertEqual(w.dtype, torch.float32)
-        self.assertEqual(b.dtype, torch.float32)
-        self.assertTensorsClose(torch.mean(torch.abs(w)), torch.tensor(0.75 * init_scale), rtol=1/3)  # TODO: improve
+        self.assertIsInstance(w, Variable)
+        self.assertIsInstance(b, Variable)
+        self.assertTupleEqual(w.data.shape, (D, K))
+        self.assertTupleEqual(b.data.shape, (K,))
+        self.assertEqual(w.data.dtype, torch.float32)
+        self.assertEqual(b.data.dtype, torch.float32)
+        self.assertTensorsClose(torch.mean(torch.abs(w.data)), torch.tensor(0.75 * init_scale), rtol=1/3)  # TODO: improve
 
     def test_init_params(self):
         D, H, K, a = 1000, 500, 50, 0.0001234
-        model = ans.classification.TwoLayerPerceptron(D, H, K, weight_scale=a)
+        model = ans.classification.TwoLayerPerceptronAutograd(D, H, K, weight_scale=a)
         self.check_init_layer(model.weight1, model.bias1, (D, H), a)
         self.check_init_layer(model.weight2, model.bias2, (H, K), a)
 
@@ -244,26 +244,26 @@ class TestTrainStep(ANSTestCase):
             [-2.2524, -1.0259,  0.8902, -0.0527,  0.6390]
         ])
         self.targets = torch.tensor([2, 0, 1, 2, 1, 2, 0, 2])
-        self.model = ans.classification.TwoLayerPerceptron(5, 4, 3)
-        self.model.weight1 = torch.tensor([
+        self.model = ans.classification.TwoLayerPerceptronAutograd(5, 4, 3)
+        self.model.weight1 = Variable(torch.tensor([
             [ 0.6404,  1.8266, -1.1524,  1.6550],
             [-0.6438,  1.1360,  0.8619,  1.1973],
             [-1.2408, -1.6897,  1.2341, -1.0806],
             [-0.7942, -0.7537,  0.4722, -0.4640],
             [-0.9144,  1.8758, -0.4184, -1.1447]
-        ])
-        self.model.bias1 = torch.tensor([-0.5695, -1.5478, -0.3433,  1.3487])
-        self.model.weight2 = torch.tensor([
+        ]))
+        self.model.bias1 = Variable(torch.tensor([-0.5695, -1.5478, -0.3433,  1.3487]))
+        self.model.weight2 = Variable(torch.tensor([
             [ 0.4080,  2.0843,  0.4360],
             [-1.4321,  0.2203, -0.5365],
             [ 1.9807, -1.3583,  0.2267],
             [ 0.4421,  0.6868,  1.1862]
-        ])
-        self.model.bias2 = torch.tensor([-1.3626, -1.2764, -1.4689])
+        ]))
+        self.model.bias2 = Variable(torch.tensor([-1.3626, -1.2764, -1.4689]))
         self.learning_rate = 0.1234
 
     def test_implementation(self):
-        self.assertNoLoops(ans.classification.TwoLayerPerceptron.train_step)
+        self.assertNoLoops(ans.classification.TwoLayerPerceptronAutograd.train_step)
 
     def test_step(self):
         loss, scores = self.model.train_step(self.inputs, self.targets, learning_rate=self.learning_rate)
@@ -279,7 +279,7 @@ class TestTrainStep(ANSTestCase):
             [ 0.4106, -2.2611, -1.0479],
             [ 0.4364, -2.3934, -1.2390]
         ])
-        self.assertTensorsClose(scores, expected_scores)
+        self.assertTensorsClose(scores.data, expected_scores)
         expected_weight1 = torch.tensor([
             [ 0.6375,  1.8252, -1.1460,  1.6543],
             [-0.6474,  1.1352,  0.8641,  1.1960],
@@ -287,30 +287,34 @@ class TestTrainStep(ANSTestCase):
             [-0.8020, -0.7556,  0.4725, -0.4630],
             [-0.9149,  1.8753, -0.4155, -1.1450]
         ])
-        self.assertTensorsClose(self.model.weight1, expected_weight1)
+        self.assertIsInstance(self.model.weight1, Variable)
+        self.assertTensorsClose(self.model.weight1.data, expected_weight1)
         expected_bias1 = torch.tensor([-0.5747, -1.5485, -0.3441,  1.3499])
-        self.assertTensorsClose(self.model.bias1, expected_bias1)
+        self.assertIsInstance(self.model.bias1, Variable)
+        self.assertTensorsClose(self.model.bias1.data, expected_bias1)
         expected_weight2 = torch.tensor([
             [ 0.4015,  2.0780,  0.4488],
             [-1.4350,  0.2068, -0.5201],
             [ 1.9699, -1.3629,  0.2421],
             [ 0.4353,  0.6752,  1.2046]
         ])
-        self.assertTensorsClose(self.model.weight2, expected_weight2)
+        self.assertIsInstance(self.model.weight2, Variable)
+        self.assertTensorsClose(self.model.weight2.data, expected_weight2)
         expected_bias2 = torch.tensor([-1.3811, -1.2928, -1.4339])
-        self.assertTensorsClose(self.model.bias2, expected_bias2)
+        self.assertIsInstance(self.model.bias2, Variable)
+        self.assertTensorsClose(self.model.bias2.data, expected_bias2)
 
 
 class TestValStep(TestTrainStep):
 
     def test_implementation(self):
-        self.assertNoLoops(ans.classification.TwoLayerPerceptron.val_step)
+        self.assertNoLoops(ans.classification.TwoLayerPerceptronAutograd.val_step)
 
     def test_step(self):
-        expected_weight1 = self.model.weight1.clone()
-        expected_bias1 = self.model.bias1.clone()
-        expected_weight2 = self.model.weight2.clone()
-        expected_bias2 = self.model.bias2.clone()
+        expected_weight1 = self.model.weight1.data.clone()
+        expected_bias1 = self.model.bias1.data.clone()
+        expected_weight2 = self.model.weight2.data.clone()
+        expected_bias2 = self.model.bias2.data.clone()
         loss, scores = self.model.val_step(self.inputs, self.targets)
         expected_loss = 1.000912
         self.assertTensorsClose(loss, expected_loss)
@@ -325,10 +329,10 @@ class TestValStep(TestTrainStep):
             [ 0.4364, -2.3934, -1.2390]
         ])
         self.assertTensorsClose(scores, expected_scores)
-        self.assertTensorsClose(self.model.weight1, expected_weight1)
-        self.assertTensorsClose(self.model.bias1, expected_bias1)
-        self.assertTensorsClose(self.model.weight2, expected_weight2)
-        self.assertTensorsClose(self.model.bias2, expected_bias2)
+        self.assertTensorsClose(self.model.weight1.data, expected_weight1)
+        self.assertTensorsClose(self.model.bias1.data, expected_bias1)
+        self.assertTensorsClose(self.model.weight2.data, expected_weight2)
+        self.assertTensorsClose(self.model.bias2.data, expected_bias2)
 
 
 class TestPreprocess(ANSTestCase):
@@ -358,7 +362,7 @@ class TestValAccuracy45(ANSTestCase):
         self.min_val_acc = 0.45
 
     def test_val_acc(self):
-        model = ans.classification.TwoLayerPerceptron.load('../output/two_layer_perceptron_weights.pt')
+        model = ans.classification.TwoLayerPerceptronAutograd.load('../output/two_layer_perceptron_autograd_weights.pt')
         train_dataset = torchvision.datasets.CIFAR10(
             root = '../data',
             train = True,
