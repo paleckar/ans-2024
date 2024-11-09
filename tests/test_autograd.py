@@ -20,6 +20,8 @@ class TestBinaryOpTensors(ANSTestCase):
         ((2, 3), (2, 3)),
         ((2, 3), tuple()),
         (tuple(), (2, 3)),
+        ((3,), (2, 3)),
+        ((2, 3), (2, 1)),
     ]
     dds = [  # dtypes and devices to test
         (torch.float32, 'cpu'),
