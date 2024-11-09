@@ -13,6 +13,7 @@
 | 5. | 16.10.2024 | [Trénování sítí v praxi II](slides/ans-04-mlp.pdf)  | inicializace, regularizace, trénování        |
 | 6. | 23.10.2024 | [Konvoluční sítě I](slides/ans-05-convolution.pdf)  | konvoluce, pooling, AlexNet, VGG16           |
 | 7. | 30.10.2024 | [Konvoluční sítě II](slides/ans-05-convolution.pdf) | ResNet a další arch., transfer learning      |
+| 8. | 6.11.2024  | [Analýza konv. sítí](slides/ans-06-analysis.pdf)    | vizualizace, adversarialy, style transfer    |
 
 
 ## Úlohy
