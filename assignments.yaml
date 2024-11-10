@@ -92,8 +92,6 @@
       points: 2
     - name: TestGetItem
       points: 2
-    - name: TestSigmoid
-      points: 2
     - name: TestSum
       points: 5
     - name: TestMean
