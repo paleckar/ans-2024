@@ -162,6 +162,15 @@ class Variable:
     
         # ENDTODO
         ########################################
+
+    def relu(self, negative_slope: float = 0.0) -> Self:
+        ########################################
+        # TODO: implement
+
+        raise NotImplementedError
+    
+        # ENDTODO
+        ########################################
     
     def sum(self, dim: Union[None, int, tuple[int, ...]] = None, keepdim: bool = False) -> Self:
         ########################################

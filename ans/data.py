@@ -11,17 +11,20 @@ class BatchLoader:
             self,
             dataset: torch.utils.data.Dataset,
             batch_size: Optional[int] = None,
-            shuffle: bool = False
+            shuffle: bool = False,
+            device: str = 'cpu'
     ) -> None:
         """
         Args:
             dataset: indexable torch Dataset returning either a tuple (input,) or (input, target)
             batch_size: How many samples in batch
             shuffle: If True, then the data should be randomly reordered on each __iter__
+            device: torch device name, e.g. 'cpu' or 'cuda:0', 'cuda:1', etc.
         """
         self.dataset = dataset
         self.batch_size = batch_size or len(dataset)
         self.shuffle = shuffle
+        self.device = device
 
     def __iter__(self) -> Iterator[tuple[torch.Tensor, ...]]:
         """
