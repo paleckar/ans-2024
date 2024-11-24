@@ -575,10 +575,9 @@ class TestDataPreprocessor(ANSTestCase):
     def check_dataset(self, orig_ds, prep_ds, train=False):
         x_orig = orig_ds.data
         x_prep, y_prep = prep_ds.tensors
-        self.assertEqual(len(orig_ds), len(prep_ds))
         self.assertEqual(x_prep.ndim, 2, msg='Preprocessed dataset must be 2D matrix (N ,D)')
-        if train:
-            self.assertEqual(x_prep.size(0), x_orig.shape[0], msg='Augmentation not allowed in validation set')
+        if not train:
+            self.assertEqual(len(orig_ds), len(prep_ds), msg='Augmentation not allowed in validation set')
         self.assertEqual(x_prep.size(1), x_orig[0].size, msg='Resizing and/or feature extraction not allowed')
         self.assertEqual(y_prep.size(0), x_prep.size(0))
         self.assertEqual(y_prep.ndim, 1, msg='Targets must be a vector of integers')
@@ -590,12 +589,12 @@ class TestDataPreprocessor(ANSTestCase):
         )
         preprocessor = self.params['preprocessor_cls']()
         preprocessor.fit(train_dataset)
-        self.check_dataset(train_dataset, preprocessor.transform(train_dataset))
+        self.check_dataset(train_dataset, preprocessor.transform(train_dataset, train=True), train=True)
         val_dataset = torchvision.datasets.CIFAR10(
             root = '../data',
             train = False,
         )
-        self.check_dataset(val_dataset, preprocessor.transform(val_dataset))
+        self.check_dataset(val_dataset, preprocessor.transform(val_dataset, train=False), train=False)
 
 
 class TestValAccuracy45(ANSTestCase):
