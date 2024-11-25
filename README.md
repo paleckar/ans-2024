@@ -30,3 +30,4 @@
 | 3. | [Autograd](assignments/autograd.ipynb)                          | 33 (33) | 5.11.2024  |
 | 4. | [Perceptron autogradem](assignments/perceptron_autograd.ipynb)  | 29 (43) | 12.11.2024 |
 | 5. | [Neural knihovna](assignments/neural_library.ipynb)             | 18 (54) | 3.12.2024  |
+| 6. | [Konvoluční síť](assignments/convolution.ipynb)                 | 22 (40) | 31.12.2024 |

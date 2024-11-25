@@ -91,7 +91,68 @@ class BatchNorm1dFunction(Function):
         # ENDTODO
         ########################################
 
-        return dinput, dgamma, dbeta
+        return dinput, dweight, dbias
+
+
+class BatchNorm2dFunction(Function):
+
+    @staticmethod
+    def forward(
+        input: torch.Tensor,
+        weight: Optional[torch.Tensor],
+        bias: Optional[torch.Tensor],
+        running_mean: Optional[torch.Tensor] = None,
+        running_var: Optional[torch.Tensor] = None,
+        momentum: float = 0.9,
+        eps: float = 1e-05,
+        training: bool = False,
+    ) -> tuple[torch.Tensor, tuple]:
+        """
+        Spatial BatchNorm for convolutional networks
+
+        Args:
+            input: shape (num_samples, num_channels, height, width)
+            weight: shape (num_channels,)
+            bias: shape (num_channels,)
+            running_mean: shape (num_channels,)
+            running_var: shape (num_channels,)
+            momentum: running average smoothing coefficient
+            eps: for numerical stabilization
+            training: whether in training mode or eval mode
+        Returns:
+            output: shape (num_samples, num_channels, height, width)
+            cache: tuple of intermediate results to use in backward
+        """
+
+        ########################################
+        # TODO: implement
+
+        raise NotImplementedError
+
+        # ENDTODO
+        ########################################
+
+        return output, cache
+
+    @staticmethod
+    def backward(doutput: torch.Tensor, cache=()) -> tuple[torch.Tensor, ...]:
+        """
+        Args:
+            doutput: gradient w.r.t. output of the forward pass; shape (num_samples, num_channels, height, width)
+            cache: cache from the forward pass
+        Returns:
+            tuple of gradients w.r.t. input (single-element tuple)
+        """
+
+        ########################################
+        # TODO: implement
+
+        raise NotImplementedError
+
+        # ENDTODO
+        ########################################
+
+        return dinput, dweight, dbias
 
 
 class DropoutFunction(Function):
@@ -114,6 +175,108 @@ class DropoutFunction(Function):
 
     @staticmethod
     def backward(doutput: torch.Tensor, cache=()) -> tuple[torch.Tensor, ...]:
+        ########################################
+        # TODO: implement
+
+        raise NotImplementedError
+
+        # ENDTODO
+        ########################################
+
+        return (dinput,)
+
+
+class Conv2dFunction(Function):
+
+    @staticmethod
+    def forward(
+        input: torch.Tensor,
+        weight: torch.Tensor,
+        bias: Optional[torch.Tensor],
+        stride: int = 1,
+        padding: int = 0,
+        dilation: int = 1,
+        groups: int = 1,
+    ) -> tuple[torch.Tensor, tuple]:
+        """
+        Args:
+            input: shape (num_samples, num_channels, height, width)
+            weight: shape (num_filters, num_channels, kernel_size[0], kernel_size[1])
+            bias: shape (num_filters,)
+            stride: convolution step size
+            padding: how much should the input be padded on each side by zeroes
+            dilation: see torch.nn.functional.conv2d
+            groups: see torch.nn.functional.conv2d
+
+        Returns:
+            output: shape (num_samples, num_filters, output_height, output_width)
+            cache: tuple of intermediate results to use in backward
+        """
+        ########################################
+        # TODO: implement
+
+        raise NotImplementedError
+
+        # ENDTODO
+        ########################################
+
+        return output, cache
+
+    @staticmethod
+    def backward(doutput: torch.Tensor, cache=()) -> tuple[torch.Tensor, ...]:
+        """
+        Args:
+            doutput: gradient w.r.t. output of the forward pass; shape (num_samples, num_filters, output_height, output_width)
+            cache: cache from the forward pass
+        Returns:
+            tuple of gradients w.r.t. input, weight and bias
+        """
+
+        ########################################
+        # TODO: implement
+
+        raise NotImplementedError
+
+        # ENDTODO
+        ########################################
+
+        return dinput, dweight, dbias
+
+
+class MaxPool2dFunction(Function):
+
+    @staticmethod
+    def forward(input: torch.Tensor, kernel_size: int = 2) -> tuple[torch.Tensor, tuple]:
+        """
+
+        Args:
+            input: shape (num_samples, num_channels, height, width)
+            window_size: size of pooling window
+        Returns:
+            output: shape (num_samples, num_channels, height / window_size, width / window_size)
+            cache: tuple of intermediate results to use in backward
+        """
+
+        ########################################
+        # TODO: implement
+
+        raise NotImplementedError
+
+        # ENDTODO
+        ########################################
+
+        return output, cache
+
+    @staticmethod
+    def backward(doutput: torch.Tensor, cache=()) -> tuple[torch.Tensor, ...]:
+        """
+        Args:
+            doutput: gradient w.r.t. output of the forward pass; shape (num_samples, num_channels, height / window_size, width / window_size)
+            cache: cache from the forward pass
+        Returns:
+            tuple of gradients w.r.t. input (single-element tuple)
+        """
+
         ########################################
         # TODO: implement
 
@@ -301,6 +464,90 @@ class BatchNorm1d(Module):
 
         # ENDTODO
         ########################################
+
+    def forward(self, x: Variable) -> Variable:
+        ########################################
+        # TODO: implement
+
+        raise NotImplementedError
+
+        # ENDTODO
+        ########################################
+
+
+class BatchNorm2d(BatchNorm1d):
+
+    def forward(self, x: Variable) -> Variable:
+        ########################################
+        # TODO: implement
+
+        raise NotImplementedError
+
+        # ENDTODO
+        ########################################
+
+
+class Conv2d(Module):
+
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        kernel_size: int,
+        stride: int = 1,
+        padding: int = 0,
+        dilation: int = 1,
+        groups: int = 1,
+        bias: bool = True,
+    ) -> None:
+        super().__init__()
+
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+        self.kernel_size = kernel_size
+        self.stride = stride
+        self.padding = padding
+        self.dilation = dilation
+        self.groups = groups
+
+        ########################################
+        # TODO: initialize weight and bias
+        # if bias is True, then bias should be zeros, otherwise set to None
+
+        self.weight = ...
+        self.bias = ...
+
+        # ENDTODO
+        ########################################
+
+    def forward(self, x: Variable) -> Variable:
+        ########################################
+        # TODO: implement
+
+        raise NotImplementedError
+
+        # ENDTODO
+        ########################################
+
+
+class MaxPool2d(Module):
+
+    def __init__(self, kernel_size: int) -> None:
+        super().__init__()
+
+        self.kernel_size = kernel_size
+
+    def forward(self, x: Variable) -> Variable:
+        ########################################
+        # TODO: implement
+
+        raise NotImplementedError
+
+        # ENDTODO
+        ########################################
+
+
+class Flatten(Module):
 
     def forward(self, x: Variable) -> Variable:
         ########################################

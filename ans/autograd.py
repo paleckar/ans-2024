@@ -1,5 +1,5 @@
 from numbers import Number
-from typing import Callable, Optional, Self, TypeAlias, Union
+from typing import Callable, Optional, TypeAlias, Self, Union
 
 import torch
 
@@ -185,6 +185,15 @@ class Variable:
         ########################################
         # TODO: implement
 
+        raise NotImplementedError
+    
+        # ENDTODO
+        ########################################
+    
+    def reshape(self, *shape: int) -> Self:
+        ########################################
+        # TODO: implement
+    
         raise NotImplementedError
     
         # ENDTODO

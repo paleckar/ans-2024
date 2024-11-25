@@ -19,7 +19,9 @@ class ANSvsTorchModules(ANSTestCase):
 
     @staticmethod
     def clone_params(module_ans, module_pt):
-        for (_, apar), (_, tpar) in zip(sorted(module_ans.named_parameters()), sorted(module_pt.named_parameters())):
+        params_ans = sorted(module_ans.named_parameters())
+        params_pt = sorted(module_pt.named_parameters())
+        for (_, apar), (_, tpar) in zip(params_ans, params_pt):
             tpar.data = apar.data.clone()
     
     def assertParamsClose(self, module_ans, module_pt):
@@ -309,7 +311,8 @@ class ANSvsTorchFunctions(ANSTestCase):
     
     def check_grads(self, inp_vars):
         for in_var in inp_vars:
-            self.assertTensorsClose(in_var.grad, in_var.data.grad)
+            msg = f"d{in_var.name} " if in_var.name is not None else ''
+            self.assertTensorsClose(in_var.grad, in_var.data.grad, msg=msg)
     
     def check_forward_pass(self, func_ans, func_pt, inp_vars):
         z_var = func_ans(*inp_vars)
@@ -326,10 +329,16 @@ class ANSvsTorchFunctions(ANSTestCase):
     
     def test_function(self):
         for shape, args, kwargs in self.configs:
-            func_ans, func_pt = self.create_equivalent_functions(shape, *args, **kwargs)
-            inp_vars = self.random_inputs(shape, *args, **kwargs)
-            z_var, z = self.check_forward_pass(func_ans, func_pt, inp_vars)
-            self.check_backward_pass(inp_vars, z_var, z)
+            msg = (f"\n*** TEST PARAMS CONFIGURATION THAT FAILED ***\n"
+                       f"shape={shape}, args={args}, kwargs={kwargs}")
+            try:
+                func_ans, func_pt = self.create_equivalent_functions(shape, *args, **kwargs)
+                inp_vars = self.random_inputs(shape, *args, **kwargs)
+                z_var, z = self.check_forward_pass(func_ans, func_pt, inp_vars)
+                self.check_backward_pass(inp_vars, z_var, z)
+            except Exception:
+                print(msg)
+                raise
 
 
 class TestDropoutFunction(ANSvsTorchFunctions):
