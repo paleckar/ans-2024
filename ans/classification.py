@@ -280,7 +280,7 @@ class AutogradClassifier(ans.nn.Module):
         self,
         inputs: torch.Tensor,
         targets: torch.Tensor,
-        learning_rate: float = 1e-3
+        **kwargs
     ) -> tuple[float, torch.Tensor]:
         ########################################
         # TODO: implement
