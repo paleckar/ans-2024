@@ -233,16 +233,16 @@ class TestBackbone(ANSTestCase):
         backbone_cls = self.params['backbone_cls']
 
         for (n, c, h, w), (k,), kwargs in self.configs:
-            try:
-                self.monkey_patch_convs()
-                backbone = backbone_cls(c, k)
-            finally:
-                self.monkey_unpatch_convs()
+            backbone = backbone_cls(c, k)
             self.assertIsInstance(backbone, ans.nn.Module)
             self.assertTrue(any(isinstance(m, ans.nn.Conv2d) for _, m in backbone.named_modules()))
 
             x_var = rand_var(n, c, h, w, name='x', dtype=torch.float32)
-            z_var = backbone(x_var)
+            try:
+                self.monkey_patch_convs()
+                z_var = backbone(x_var)
+            finally:
+                self.monkey_unpatch_convs()
             self.assertGreater(self.conv_counter, 0, msg='Model must use convolution')
             self.assertEqual(z_var.data.ndim, 2, msg=f'Outputs should be {n} x {k} logits')
             self.assertEqual(z_var.data.size(0), x_var.data.size(0), msg=f'Outputs should be {n} x {k} logits')

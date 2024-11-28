@@ -12,17 +12,20 @@ from .test_perceptron_autograd import TestUnaryOp, UnaryOperandType
 from .test_linear_classification import TestBatchLoader
 
 
-class ANSvsTorchModules(ANSTestCase):
+class ANSvsTorchParamsTest(ANSTestCase):
+
+    def clone_params(self, module_ans, module_pt, transpose=False):
+        params_ans = sorted(module_ans.named_parameters())
+        params_pt = sorted(module_pt.named_parameters())
+        self.assertEqual(len(params_ans), len(params_pt))
+        for (_, apar), (_, tpar) in zip(params_ans, params_pt):
+            tpar.data = apar.data.clone() if not transpose else apar.data.clone().t()
+
+
+class ANSvsTorchModules(ANSvsTorchParamsTest):
 
     configs = []
     trainings = [True, False]
-
-    @staticmethod
-    def clone_params(module_ans, module_pt):
-        params_ans = sorted(module_ans.named_parameters())
-        params_pt = sorted(module_pt.named_parameters())
-        for (_, apar), (_, tpar) in zip(params_ans, params_pt):
-            tpar.data = apar.data.clone()
     
     def assertParamsClose(self, module_ans, module_pt):
         for (_, apar), (_, tpar) in zip(sorted(module_ans.named_parameters()), sorted(module_pt.named_parameters())):
@@ -87,10 +90,8 @@ class TestLinearModule(ANSvsTorchModules):
         ((13, 400), (400, 300), dict())
     ]
 
-    @staticmethod
-    def clone_params(module_ans, module_pt):
-        for (_, apar), (_, tpar) in zip(sorted(module_ans.named_parameters()), sorted(module_pt.named_parameters())):
-            tpar.data = apar.data.clone().t()
+    def clone_params(self, module_ans, module_pt, transpose=False):
+        return super().clone_params(module_ans, module_pt, transpose=True)
     
     def create_equivalent_modules(self, shape, *args, **kwargs):
         module_ans = ans.nn.Linear(*args, **kwargs)
@@ -176,7 +177,7 @@ class TestSequentialModule(TestLinearModule):
         pass
 
 
-class TestSGD(ANSTestCase):
+class TestSGD(ANSvsTorchParamsTest):
 
     def setUp(self) -> None:
         self.model_ans = ans.nn.Sequential(
@@ -193,7 +194,7 @@ class TestSGD(ANSTestCase):
             torch.nn.Sigmoid(),
             torch.nn.Linear(4, 3)
         )
-        TestLinearModule.clone_params(self.model_ans, self.model_pt)
+        self.clone_params(self.model_ans, self.model_pt, transpose=True)
 
     def test_init(self) -> None:
         model = ans.nn.Linear(4, 4).to(dtype=torch.float16)
@@ -238,7 +239,7 @@ class TestSGD(ANSTestCase):
         self._test_config(torch.rand(1).item(), torch.rand(1).item(), torch.rand(1).item())
 
 
-class TestAdam(ANSTestCase):
+class TestAdam(ANSvsTorchParamsTest):
 
     def setUp(self) -> None:
         self.model_ans = ans.nn.Sequential(
@@ -255,7 +256,7 @@ class TestAdam(ANSTestCase):
             torch.nn.Sigmoid(),
             torch.nn.Linear(4, 3)
         )
-        TestLinearModule.clone_params(self.model_ans, self.model_pt)
+        self.clone_params(self.model_ans, self.model_pt, transpose=True)
 
     def test_init(self) -> None:
         model = ans.nn.Linear(4, 4).to(dtype=torch.float16)
@@ -428,13 +429,6 @@ class TestBatchNorm1dModule(ANSvsTorchModules):
         ((100, 40), tuple(), dict(affine=True)),
     ]
 
-    @staticmethod
-    def clone_params(module_ans, module_pt):
-        params_ans = sorted(module_ans.named_parameters()) + [module_ans.weight, module_ans.bias]
-        params_pt = sorted(module_pt.named_parameters())
-        for (_, apar), (_, tpar) in zip(params_ans, params_pt):
-            tpar.data = apar.data.clone()
-
     def create_equivalent_modules(self, shape, *args, **kwargs):
         n, d = shape
         momentum = torch.rand(1).item()
@@ -447,6 +441,12 @@ class TestBatchNorm1dModule(ANSvsTorchModules):
         if module_pt.affine:
             self.assertTensorsClose(module_ans.weight.data, module_pt.weight)
             self.assertTensorsClose(module_ans.bias.data, module_pt.bias)
+    
+    def clone_params(self, module_ans, module_pt):
+        if module_pt.affine:
+            module_ans.weight.data = torch.randn_like(module_pt.weight)
+            module_ans.bias.data = torch.randn_like(module_pt.bias)
+        return super().clone_params(module_ans, module_pt)
 
 
 class TestAutogradClassifier(ANSTestCase):
