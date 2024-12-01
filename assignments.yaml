@@ -121,7 +121,7 @@
 
 - notebook: neural_library
   testfile: test_neural_library
-  deadline: 2024-12-03
+  deadline: 2024-12-17
   tests:
     - name: TestLinearModule
       points: 2
