@@ -309,11 +309,11 @@ class TestValAccuracy75(ANSTestCase):
             self.check_val_acc(model, device='cpu')
 
 
-class TestValAccuracy85(ANSTestCase):
+class TestValAccuracy85(TestValAccuracy75):
 
     min_val_acc = 0.85
 
 
-class TestValAccuracy90(ANSTestCase):
+class TestValAccuracy90(TestValAccuracy75):
 
     min_val_acc = 0.90
