@@ -1,4 +1,7 @@
+import re
 from typing import Any
+
+import gdown
 import numpy as np
 import torch
 import torch.utils
@@ -301,7 +304,15 @@ class TestValAccuracy75(ANSTestCase):
         self.assertGreater(val_loss, train_loss - 0.1)
 
     def test_val_acc(self):
-        model = ans.classification.AutogradClassifier.load('../output/conv_classifier.pt')
+        try:
+            model = ans.classification.AutogradClassifier.load('../output/conv_classifier.pt')
+        except FileNotFoundError:
+            with open('../output/conv_classifier.gdrive') as f:
+                model_link = f.read().strip()
+            file_id = re.search(r'[a-zA-Z0-9_-]{33,}', model_link).group()
+            model_link = f"https://drive.google.com/uc?id={file_id}"
+            gdown.download(model_link, '../output/conv_classifier.pt', quiet=False)
+            model = ans.classification.AutogradClassifier.load('../output/conv_classifier.pt')
         try:
             self.check_val_acc(model, device='cuda')
         except RuntimeError:
