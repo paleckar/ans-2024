@@ -1,5 +1,8 @@
 # Aplikace neuronových sítí 2024
 
+> [!NOTE]
+> Kurz byl ukončen 31.1.2025.
+
 
 ## Přednášky
 
@@ -23,7 +26,6 @@
 
 - Bodování úloh a termíny odevzdání jsou specifikovány v konfiguračním souboru [assignments.yaml](assignments.yaml).
 - Odevzdání úlohy po termínu bude penalizováno odečtením 50 % bodů.
-- Předmět bude ukončen **31.1.2025**. Po tomto datu již nebude možné získat další body a veškerá hodnocení budou konečná.
 - Další podmínky a známkování jsou v přednášce [Úvod](slides/ans-00-intro.pdf).
 
 | #  | úloha                                                           | body    | deadline   |
