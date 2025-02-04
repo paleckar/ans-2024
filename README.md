@@ -14,6 +14,7 @@
 | 6. | 23.10.2024 | [Konvoluční sítě I](slides/ans-05-convolution.pdf)  | konvoluce, pooling, AlexNet, VGG16           |
 | 7. | 30.10.2024 | [Konvoluční sítě II](slides/ans-05-convolution.pdf) | ResNet a další arch., transfer learning      |
 | 8. | 6.11.2024  | [Analýza konv. sítí](slides/ans-06-analysis.pdf)    | vizualizace, adversarialy, style transfer    |
+| 9. | 13.11.2024 | [Rekurentní sítě](slides/ans-07-recurrence.pdf)     | jaz. model, RNN, BPTT, LSTM, GRU, CTC        |
 
 
 ## Úlohy
@@ -29,5 +30,5 @@
 | 2. | [Dvouvrstvý perceptron](assignments/two_layer_perceptron.ipynb) | 14 (17) | 29.10.2024 |
 | 3. | [Autograd](assignments/autograd.ipynb)                          | 33 (33) | 5.11.2024  |
 | 4. | [Perceptron autogradem](assignments/perceptron_autograd.ipynb)  | 29 (43) | 12.11.2024 |
-| 5. | [Neural knihovna](assignments/neural_library.ipynb)             | 18 (54) | 17.12.2024  |
+| 5. | [Neural knihovna](assignments/neural_library.ipynb)             | 18 (54) | 17.12.2024 |
 | 6. | [Konvoluční síť](assignments/convolution.ipynb)                 | 22 (40) | 31.12.2024 |
